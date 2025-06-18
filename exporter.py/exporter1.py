@@ -17,74 +17,76 @@ def fill_quote_form(quote_page):
 
 def run():
     with sync_playwright() as p:
+        browser = None
         try:
             browser = p.chromium.launch(headless=False, slow_mo=500)
             context = browser.new_context(viewport={"width": 1536, "height": 960})
             page = context.new_page()
 
-            # Step 1: Visit IndiaMART and search "ball"
+            # Step 1: Search "ball"
             page.goto("https://www.indiamart.com/", timeout=20000)
-            page.wait_for_selector("input#search_string", timeout=10000)
             page.fill("input#search_string", "ball")
             page.click("input#btnSearch")
             page.wait_for_load_state("networkidle")
 
-            # Step 2: Click on Get Quote and handle popup
+            # Step 2: Get Quote
             with context.expect_page() as new_tab:
                 page.click("a:has-text('Get Quote')")
             quote_page = new_tab.value
             quote_page.wait_for_load_state("domcontentloaded")
-
-            # Step 3-6: Fill and submit form
             fill_quote_form(quote_page)
 
-            # Step 7: Switch back to parent
+            # Step 3–9: Settings adjustments
             page.bring_to_front()
-
-            # Step 8: Click English and Save
-            page.wait_for_selector("text=English", timeout=5000)
             page.click("text=English")
-            page.wait_for_selector("text=Save", timeout=5000)
             page.click("text=Save")
-
-            # Step 9: Change Currency to USD
             page.click("#currencyText")
-            page.wait_for_selector("select#currency-select", timeout=5000)
             page.select_option("select#currency-select", value="USD")
-            page.click("#currencyWrapper .save-btn", timeout=5000)
+            page.click("#currencyWrapper .save-btn")
 
-            # Step 10: Click Sign In (first time)
-            page.click("text=Sign In", timeout=5000)
-
-        
+            # Step 10: Click Sign In
+            print("➡ Clicking Sign In (1st time)...")
+            page.locator("div.sign-in-btn.language-currency-btn").scroll_into_view_if_needed()
+            page.locator("div.sign-in-btn.language-currency-btn").click(force=True)
+            page.wait_for_timeout(2000)
 
             # Step 11: Click Home
-            page.click("a:has-text('Home')", timeout=5000)
+            page.click("a:has-text('Home')")
 
-            # Step 12: Search for "toys"
-            page.wait_for_selector("input#searchInputHome", timeout=3000)
+            # Step 12: Search for toys
             page.fill("input#searchInputHome", "toys")
             page.click("button#btnSearchHome")
-            page.wait_for_load_state("networkidle")
+        
 
-            # Step 13: Click Sign In again
-            page.click("text=Sign In", timeout=5000)
+            # Step 13: Expand Sign In dropdown
+            print("🔄 Step 13: Clicking 'Sign In' to open dropdown...")
+            try:
+                page.click("div.sign-in-btn.language-currency-btn")
+                page.wait_for_selector("a[href*='get-quote']", timeout=5000)
+                print("✅ Dropdown opened successfully.")
+            except Exception as e:
+                print("❌ Step 13 failed:", e)
 
-            # Step 14: Click Get Quote again
-            with context.expect_page(timeout=15000) as new_tab2:
-                page.evaluate("document.querySelector('a[href*=\"get-quote\"]')?.click()")
-            quote_page2 = new_tab2.value
-            quote_page2.wait_for_load_state("domcontentloaded", timeout=15000)
-            quote_page2.wait_for_selector("input#nameBLInput", timeout=10000)
-            quote_page2.wait_for_load_state("domcontentloaded")
-
-            # Step 15: Repeat Step 3-6
-            fill_quote_form(quote_page2)
+            # Step 14: Click Get Quote from dropdown
+            print("🔄 Step 14: Clicking 'Get Quote' inside dropdown...")
+            try:
+                with context.expect_page(timeout=10000) as new_tab2:
+                    page.click("a[href*='get-quote']", timeout=5000)
+                quote_page2 = new_tab2.value
+                quote_page2.wait_for_load_state("domcontentloaded")
+                quote_page2.wait_for_selector("input#nameBLInput", timeout=10000)
+                print("✅ Second Get Quote page loaded.")
+                # Step 15: Fill quote form again
+                print("➡ Step 15: Filling second quote form...")
+                fill_quote_form(quote_page2)
+            except Exception as e:
+                print("❌ Step 14 failed:", e)
 
         except Exception as e:
-            print("❌ Exception occurred:", e)
+            print("❌ Main exception occurred:", e)
         finally:
-            browser.close()
+            if browser:
+                browser.close()
 
 if __name__ == "__main__":
     run()
