@@ -8,8 +8,10 @@ def run_second_script():
 
         try:
             # Step 1: Navigate to the page with increased timeout
-            page.goto("https://export.indiamart.com/search.php?ss=toy", timeout=60000)
-            page.wait_for_selector("text=Verified Exporters for toy", timeout=20000)
+            page.goto("https://www.indiamart.com/", timeout=20000)
+            page.fill("input#search_string", "toys")
+            page.click("input#btnSearch")
+            page.wait_for_load_state("networkidle")
             print("✅ Page loaded successfully.")
 
             # Step 2: Click directly on the specified filters

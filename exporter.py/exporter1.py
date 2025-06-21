@@ -23,11 +23,11 @@ def run():
             context = browser.new_context(viewport={"width": 1536, "height": 960})
             page = context.new_page()
 
-            # Step 1: Search "ball"
-            page.goto("https://www.indiamart.com/", timeout=20000)
-            page.fill("input#search_string", "ball")
-            page.click("input#btnSearch")
-            page.wait_for_load_state("networkidle")
+            # Step 1: Scrolling
+            page.goto("https://export.indiamart.com/", timeout=20000)
+            for _ in range(10):  # Adjust the range for more or less scrolling
+                page.mouse.wheel(0, 100)  # Scroll down by 100 pixels
+            page.wait_for_timeout(300)  # Wait for 300 milliseconds between scrolls
 
             # Step 2: Get Quote
             with context.expect_page() as new_tab:
