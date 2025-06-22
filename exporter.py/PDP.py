@@ -29,31 +29,31 @@ def handle_pdp_page():
 
         # Wait for the page to load completely
         page.wait_for_load_state("networkidle")
-        time.sleep(2)  # Additional wait to observe
+        time.sleep(2) 
 
         # Step 2: Click on the product name
         page.wait_for_selector('p#prdname_2', timeout=70000)
         page.click('p#prdname_2')
         print("✅ Clicked on product name")
-        time.sleep(2)  # Wait to observe
+        time.sleep(2)  
 
         # Step 3: Click on "Get Best Price"
         page.wait_for_selector('text="Get Best Price"', timeout=70000)
         page.click('text="Get Best Price"')
         print("✅ Clicked on Get Best Price")
-        time.sleep(2)  # Wait to observe
+        time.sleep(2) 
 
         # Step 4: Enter Email ID
         container_selector = '#frEmInputDiv'
         page.wait_for_selector(container_selector, timeout=70000)
         email_input_selector = f"{container_selector} input"
         page.fill(email_input_selector, "johndoe123@temp-mail.org")
-        time.sleep(2)  # Wait to observe
+        time.sleep(2)  
         submit_button_selector = 'input[onclick="loginSubmit(event,true)"]'
         page.wait_for_selector(submit_button_selector, timeout=70000)
         page.click(submit_button_selector)
         print("✅ Clicked on Submit button1")
-        time.sleep(2)  # Wait to observe
+        time.sleep(2)  
 
         # Fill requirement 1
         fill_requirement(
