@@ -1,0 +1,103 @@
+from playwright.sync_api import sync_playwright
+
+def run():
+    print("🚀 Script started")
+    with sync_playwright() as p:
+        browser = None
+        context = None
+        try:
+            # Launch browser
+            browser = p.chromium.launch(headless=False, channel="chrome", slow_mo=500)
+            context = browser.new_context(viewport={"width": 1366, "height": 768})
+            page = context.new_page()
+
+            # Step 1: Open the website
+            page.goto("https://seller.indiamart.com/")
+            print("🌐 Opened IndiaMART seller portal")
+
+            # Step 2: Enter mobile number
+            page.fill("#mobNo", "7011174164")
+            print("📲 Entered mobile number")
+
+            # Step 3: Click 'Start Selling'
+            page.get_by_role("button", name="Start Selling").click()
+            print("➡️ Clicked 'Start Selling'")
+
+            # Step 4: Enter password
+            page.wait_for_selector("#passwordbtn1", timeout=5000)
+            page.click("#passwordbtn1")
+            page.fill("input[type='password']", "Rohan@1234")
+            print("🔐 Entered password")
+
+            # Step 5: Sign in
+            page.click("#signWP")
+            page.wait_for_timeout(3000)
+            print("✅ Login successful")
+            
+            # Navigate to BuyLeads
+            page.wait_for_selector("a:has-text('BuyLeads')", timeout=10000)
+            page.click("a:has-text('BuyLeads')")
+            print("✅ Landed on BL page")
+            
+            # Navigate to Latest Tenders
+            page.wait_for_selector('a:has-text("Latest Tenders")', timeout=5000)
+            page.click('a:has-text("Latest Tenders")')
+            print("✅ Clicked on Latest Tenders link")
+            page.wait_for_timeout(3000)
+
+            # Handle Tenders: Mutually exclusive scenarios
+            for i in range(4):  # Loop for up to 4 tender entries
+                try:
+                    # Click on "View Tender Information"
+                    page.wait_for_selector(".buyButnNew", timeout=10000)
+                    page.click(".buyButnNew")
+                    print(f"✅ Clicked 'View Tender Information' for Tender {i + 1}")
+                    page.wait_for_timeout(2000)
+
+                    # Scenario 1: Check for "Buy Now" buttons
+                    if page.locator("button.buynow_new").count() > 0:
+                        print("💡 Detected 'Buy Now' buttons.")
+                        buy_now_buttons = page.locator("button.buynow_new")
+                        for j in range(buy_now_buttons.count()):
+                            buy_now_buttons.nth(j).click()
+                            print(f"✅ Clicked 'Buy Now' button {j + 1}")
+                            page.wait_for_timeout(2000)  # Short wait for the action
+                            page.go_back()  # Navigate back to tender list
+                            page.wait_for_timeout(2000)
+                        continue  # Skip Scenario 2 if Scenario 1 executes
+
+                    # Scenario 2: Check for "Purchased Tender" modal
+                    elif page.locator("div.purchased-det").is_visible():
+                        print("💡 Detected 'Purchased Tender' modal.")
+                        # Click on "View Tender Document" button
+                        if page.locator("div.purchased-det a:has-text('View Tender Document')").is_visible():
+                            page.click("div.purchased-det a:has-text('View Tender Document')")
+                            print("✅ Clicked 'View Tender Document'")
+                        # Close the modal
+                        if page.locator("div.purchased-det button").is_visible():
+                            page.click("div.purchased-det button")
+                            print("✅ Closed 'Purchased Tender' modal")
+                        continue  # Skip Scenario 1 if Scenario 2 executes
+
+                    else:
+                        print("❓ Unknown state detected. No 'Buy Now' or 'Purchased Tender' modal.")
+
+                except Exception as e:
+                    print(f"⚠️ Error handling Tender {i + 1}: {e}")
+                finally:
+                    page.go_back()  # Ensure we're back on the tender list
+                    page.wait_for_load_state("load")
+                    page.wait_for_timeout(2000)
+
+            # Close the browser
+            browser.close()
+            print("✅ Browser closed successfully")
+
+        except Exception as e:
+            print(f"❌ Unexpected error: {str(e)}")
+            if browser:
+                browser.close()
+                print("⚠️ Browser closed after error")
+
+if __name__ == "__main__":
+    run()

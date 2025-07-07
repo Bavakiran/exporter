@@ -93,18 +93,22 @@ def run_second_script():
                     print("✅ Sent OTP again.")
 
                     # Close OTP modal
-                    page.locator('svg[width="22"][height="22"]').nth(2).click(timeout=5000)
+                    page.locator('svg[width="22"][height="22"]').nth(3).click(timeout=5000)
                     print("✅ Closed OTP modal.")
                 except Exception as e:
                     print(f"❌ Error in OTP process: {e}")
                     
             # Scroll down slowly and click "Home"
+            
             for _ in range(10):  
                 page.mouse.wheel(0, 100)  
             page.wait_for_timeout(300)  
-            page.locator('a.clrBlk').wait_for(timeout=5000)
-            page.locator('a.clrBlk').click()
-            print("✅ Home")    
+
+            # Fix: Click on correct "Home" link only
+            page.get_by_role("link", name="Home", exact=True).wait_for(timeout=5000)
+            page.get_by_role("link", name="Home", exact=True).click()
+            print("✅ Home")
+    
             
         except Exception as e:
             print(f"❌ Error occurred: {e}")

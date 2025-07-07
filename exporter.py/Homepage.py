@@ -36,10 +36,8 @@ def run_homepage_script():
         for _ in range(10):  
             page.mouse.wheel(0, 100)  
         page.wait_for_timeout(300)  
-        page.locator('a.clrBlk').wait_for(timeout=5000)
-        page.locator('a.clrBlk').click()
-        print("✅ Home")       
-
+        page.get_by_role("link", name="Home", exact=True).click()
+        print("✅ Home clicked")
         browser.close()
 
         

@@ -29,7 +29,7 @@ def handle_company_page():
             page.click('input[type="submit"][onclick="reqDetailSubmit(event)"]', timeout=5000)
             time.sleep(2)
             page.click('input[type="submit"][onclick="userEnrichmentSubmit(event)"]', timeout=5000)
-            page.locator('svg[width="22"][height="22"]').nth(1).click(timeout=7000)
+            page.locator('svg[width="22"][height="22"]').nth(2).click(timeout=7000)
             print("✅ Requirement1 Submitted successfully")
 
             # Step 4: Switch between tabs
@@ -80,7 +80,7 @@ def handle_company_page():
             page.fill('textarea[placeholder="Additional details about your requirement..."]', "hi hello")
             page.click('input[type="submit"][onclick="reqDetailSubmit(event)"]', timeout=5000)
             page.click('input[type="submit"][onclick="userEnrichmentSubmit(event)"]', timeout=5000)
-            page.locator('svg[width="22"][height="22"]').nth(1).click(timeout=7000)
+            page.locator('svg[width="22"][height="22"]').nth(2).click(timeout=7000)
             print("✅ Requirement2 Submitted successfully")
 
         except Exception as e:

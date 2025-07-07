@@ -1,4 +1,4 @@
-import exporter1
+import header
 import searchpage
 import PDP
 import Homepage
@@ -9,8 +9,8 @@ if __name__ == "__main__":
     print("🚀 Running Homepage.py (First Script)...")
     Homepage.run_homepage_script()
     
-    print("🚀 Running exporter1.py (Second Script)...")
-    exporter1.run()
+    print("🚀 Running .py (Second Script)...")
+    header.run()
 
     print("\n🚀 Running searchpage.py (Third Script)...")
     searchpage.run_second_script()
